@@ -170,10 +170,10 @@ app.post('/init', async(req, res) => {
       total_amount: req.body.total_amount,
       currency: 'BDT',
       tran_id: uuidv4(),
-      success_url: 'http://localhost:5000/success',
-      fail_url: 'http://localhost:5000/fail',
-      cancel_url: 'http://localhost:5000/cancel',
-      ipn_url: 'http://localhost:5000/ipn',
+      success_url: 'https://enigmatic-citadel-27942.herokuapp.com/success',
+      fail_url: 'https://enigmatic-citadel-27942.herokuapp.com/fail',
+      cancel_url: 'https://enigmatic-citadel-27942.herokuapp.com/cancel',
+      ipn_url: 'https://enigmatic-citadel-27942.herokuapp.com/ipn',
       shipping_method: 'Courier',
       paymentStatus:'panding',
       product_name: req.body.product_name,
@@ -205,7 +205,7 @@ app.post('/init', async(req, res) => {
   // console.log(data)
   // insert data into database 
   const order=await othersPaymentCollection.insertOne(data)
-  const sslcommer = new SSLCommerzPayment(process.env.STORE_ID, process.env.STORE_PASSWORD,false) //true for live default false for sandbox
+  const sslcommer = new SSLCommerzPayment(process.env.STORE_ID, process.env.STORE_PASSWORD,true) //true for live default false for sandbox
   sslcommer.init(data).then(data => {
       //process the response that got from sslcommerz 
       //https://developer.sslcommerz.com/doc/v4/#returned-parameters
@@ -230,7 +230,7 @@ app.post ('/success', async(req,res)=>{
     }
 
   })
-  res.status(200).redirect(`http://localhost:3000/success/${req.body.tran_id}`)
+  res.status(200).redirect(`https://doctor-portal-5534a.web.app/success/${req.body.tran_id}`)
 })
 app.post ('/fail', async(req,res)=>{
   // console.log(req.body);
@@ -240,7 +240,7 @@ const order=await othersPaymentCollection.deleteOne({tran_id:req.body.tran_id})
 app.post ('/cancel', async(req,res)=>{
   // console.log(req.body);
   const order=await othersPaymentCollection.deleteOne({tran_id:req.body.tran_id})
-  res.status(200).redirect(`http://localhost:3000`)
+  res.status(200).redirect(`https://doctor-portal-5534a.web.app`)
 })
 
 // payment validate check and status update for pading to confarm 
