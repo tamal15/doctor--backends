@@ -63,6 +63,7 @@ async function run(){
       const appointmentCollection=database.collection('appointment')
       const registerCollection=database.collection('register')
       const othersPaymentCollection=database.collection('othersPayment')
+      const productCollection=database.collection('medicin')
      
       // app get 
       app.get('/appointments', async(req,res)=>{
@@ -170,8 +171,8 @@ app.post('/init', async(req, res) => {
       total_amount: req.body.total_amount,
       currency: 'BDT',
       tran_id: uuidv4(),
-      // success_url: 'https://enigmatic-citadel-27942.herokuapp.com/success',
-      success_url: 'http://localhost:5000/success',
+      success_url: 'https://enigmatic-citadel-27942.herokuapp.com/success',
+      // success_url: 'http://localhost:5000/success',
       fail_url: 'https://enigmatic-citadel-27942.herokuapp.com/fail',
       cancel_url: 'https://enigmatic-citadel-27942.herokuapp.com/cancel',
       ipn_url: 'https://enigmatic-citadel-27942.herokuapp.com/ipn',
@@ -231,12 +232,13 @@ app.post ('/success', async(req,res)=>{
     }
 
   })
+  // res.status(200).redirect(`https://doctor-portal-5534a.web.app/success/${req.body.tran_id}`)
   res.status(200).redirect(`https://doctor-portal-5534a.web.app/success/${req.body.tran_id}`)
 })
 app.post ('/fail', async(req,res)=>{
   // console.log(req.body);
 const order=await othersPaymentCollection.deleteOne({tran_id:req.body.tran_id})
-  res.status(400).redirect(`http://localhost:3000`)
+  res.status(400).redirect(`https://doctor-portal-5534a.web.app`)
 })
 app.post ('/cancel', async(req,res)=>{
   // console.log(req.body);
@@ -285,7 +287,55 @@ app.get('/orders/:tran_id', async(req,res)=>{
 
          });
          res.json({ clientSecret: paymentIntent.client_secret })
-       })
+       });
+
+
+      //  add product post database store
+      app.post('/user', async(req,res)=>{
+        const service=req.body;
+        console.log("hit the api",service)
+
+        const result=await productCollection.insertOne(service)
+        console.log(result);
+        res.json(result)
+      })
+
+      // add product database theke data gulo niye asbo 
+      app.get('/user',async(req,res)=>{
+        const cursor=productCollection.find({})
+        const services=await cursor.toArray();
+        res.send(services)
+      });
+
+
+      // product details page 
+      app.get('/user/:id', async(req,res)=>{
+        const id=req.params.id;
+        const query={_id:ObjectId(id)};
+        const service=await productCollection.findOne(query);
+        res.json(service)
+      });
+
+      // patient appointment database theke data niye asbo 
+      // app.get('/patient', async(req,res)=>{
+      //   const cursor=appointmentCollection.find({});
+      //   const result= await cursor.toArray();
+      //   res.send(result)
+      // });
+
+      
+      // app get 
+      app.get('/patient', async(req,res)=>{
+        // const email=req.query.email
+        const date=req.query.date;
+        // const date=new Date(req.query.date).toLocaleDateString();
+        console.log(date)
+        const query={ date:date}
+        console.log(query)
+        const cursor=appointmentCollection.find(query)
+        const appointment=await cursor.toArray()
+        res.json(appointment)
+      })
       
     }
 
