@@ -225,11 +225,11 @@ app.post('/init', async(req, res) => {
       total_amount: req.body.total_amount,
       currency: 'BDT',
       tran_id: uuidv4(),
-      success_url: 'https://doctor-backend.onrender.com/success',
+      success_url: 'https://doctor-backends.up.railway.app/success',
       // success_url: 'http://localhost:5000/success',
-      fail_url: 'https://doctor-backend.onrender.com/fail',
-      cancel_url: 'https://doctor-backend.onrender.com/cancel',
-      ipn_url: 'https://doctor-backend.onrender.com/ipn',
+      fail_url: 'https://doctor-backends.up.railway.app/fail',
+      cancel_url: 'https://doctor-backends.up.railway.app/cancel',
+      ipn_url: 'https://doctor-backends.up.railway.app/ipn',
       shipping_method: 'Courier',
       paymentStatus:'panding',
       product_name: req.body.product_name,
@@ -441,9 +441,9 @@ app.post('/inits', async(req, res) => {
       total_amount: req.body.total_amount,
       currency: req.body.currency,
       tran_id: uuidv4(),
-      success_url: 'https://doctor-backend.onrender.com/successs',
-      fail_url: 'https://doctor-backend.onrender.com/fail',
-      cancel_url: 'https://doctor-backend.onrender.com/cancel',
+      success_url: 'https://doctor-backends.up.railway.app/successs',
+      fail_url: 'https://doctor-backends.up.railway.app/fail',
+      cancel_url: 'https://doctor-backends.up.railway.app/cancel',
       ipn_url: 'http://yoursite.com/ipn',
       shipping_method: 'Courier',
       product_name: "req.body.product_name",
@@ -509,19 +509,19 @@ app.post('/successs',async(req,res)=>{
       }
   
     })
-  res.status(200).redirect(`http://localhost:3000/successs/${req.body.tran_id}`)
+  res.status(200).redirect(`https://doctor-portal-5534a.web.app/successs/${req.body.tran_id}`)
   // res.status(200).json(req.body)
 })
 
 app.post ('/fail', async(req,res)=>{
   // console.log(req.body);
 const order=await adminBuyPaymentCollection.deleteOne({tran_id:req.body.tran_id})
-  res.status(400).redirect('http://localhost:3000')
+  res.status(400).redirect('https://doctor-portal-5534a.web.app')
 })
 app.post ('/cancel', async(req,res)=>{
   // console.log(req.body);
   const order=await adminBuyPaymentCollection.deleteOne({tran_id:req.body.tran_id})
-  res.status(200).redirect('http://localhost:3000')
+  res.status(200).redirect('https://doctor-portal-5534a.web.app')
 })
 
 
