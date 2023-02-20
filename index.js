@@ -261,7 +261,7 @@ app.post('/init', async(req, res) => {
   // console.log(data)
   // insert data into database 
   const order=await othersPaymentCollection.insertOne(data)
-  const sslcommer = new SSLCommerzPayment(process.env.STORE_ID, process.env.STORE_PASSWORD,false) //true for live default false for sandbox
+  const sslcommer = new SSLCommerzPayment(process.env.STORES_ID, process.env.STORES_PASSWORD,false) //true for live default false for sandbox
   sslcommer.init(data).then(data => {
       //process the response that got from sslcommerz 
       //https://developer.sslcommerz.com/doc/v4/#returned-parameters
@@ -484,7 +484,7 @@ app.post('/inits', async(req, res) => {
   // insert order data into database 
   const order=await adminBuyPaymentCollection.insertOne(data)
   // console.log(data)
-  const sslcommer = new SSLCommerzPayment(process.env.STORE_ID,process.env.STORE_PASSWORD,false) //true for live default false for sandbox
+  const sslcommer = new SSLCommerzPayment(process.env.STORES_ID,process.env.STORES_PASSWORD,false) //true for live default false for sandbox
   sslcommer.init(data).then(data => {
       //process the response that got from sslcommerz 
       //https://developer.sslcommerz.com/doc/v4/#returned-parameters
