@@ -341,7 +341,7 @@ app.get('/orders/:tran_id', async(req,res)=>{
   res.json(order)
 })
 
-
+// push tge data doctor portal ad 
 
       // bikash payment end 
 
@@ -598,7 +598,48 @@ app.get('/payorders/:tran_id', async(req,res)=>{
               
 
 
-    })
+    });
+
+
+    // ambulance show 
+
+    app.get("/branch", async (req, res) => {
+      const page = req.query.page;
+      const size = parseInt(req.query.size);
+      const query = req.query;
+      delete query.page
+      delete query.size
+      Object.keys(query).forEach(key => {
+          if (!query[key])
+              delete query[key]
+      });
+
+      if (Object.keys(query).length) {
+          const cursor = ambulanceCollection.find(query, status = "approved");
+          const count = await cursor.count()
+          const allData = await cursor.skip(page * size).limit(size).toArray()
+          res.json({
+              allData, count
+          });
+      } else {
+          const cursor = ambulanceCollection.find({
+              // status: "approved"
+          });
+          const count = await cursor.count()
+          const allData = await cursor.skip(page * size).limit(size).toArray()
+
+          res.json({
+              allData, count
+          });
+
+          app.get('/branch/:id', async (req, res) => {
+            const id = req.params.id;
+            const result = await ambulanceCollection.findOne({ _id: ObjectId(id) });
+            res.json(result)
+        });
+      }
+
+  });
 
 
 
