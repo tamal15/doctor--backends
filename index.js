@@ -72,6 +72,13 @@ async function run(){
       const adminuploadMedicinCollection=database.collection('adminMedicin')
       const adminBuyPaymentCollection=database.collection('UserProductPaymnet')
       const ambulanceCollection=database.collection('ambulanceServices')
+      const icuSupportCollection=database.collection('icuSupport')
+      const icuSupportBookCollection=database.collection('icuSupportbook')
+      const addBloodCollection=database.collection('addBlood')
+      const addNurseCollection=database.collection('addNurse')
+      const addOrganCollection=database.collection('addOrgan')
+      const applyvideoCollection=database.collection('applyVideo')
+      const medicineUpcommingCollection=database.collection('upcommingMedicine')
      
       // app get 
       app.get('/appointments', async(req,res)=>{
@@ -92,6 +99,337 @@ async function run(){
         res.json(result)
     });
 
+
+    app.get('/upMedicine', async (req, res) => {
+      const result = await medicineUpcommingCollection.find({}).toArray()
+      res.json(result)
+    });
+
+    // myorder check 
+    app.get("/myOrder/:email", async (req, res) => {
+      // const buyeremail=req.body.cartProducts.map((data)=>data.buyerEmail)
+      console.log(req.params.email);
+      const email = req.params.email;
+      const result = await adminBuyPaymentCollection
+        .find({ cus_email: email })
+        .toArray();
+      res.send(result);
+    });
+
+    app.get("/my", async (req, res) => {
+      
+      const email = req.params.email;
+      console.log(email)
+      const result = await adminBuyPaymentCollection
+        .find()
+        .toArray();
+      res.send(result);
+    });
+
+    app.put('/updateStatusdata/:id', async(req,res)=>{
+      const id=req.params.id;
+      const updateDoc=req.body.status;
+      console.log(updateDoc)
+      console.log(updateDoc)
+      const filter={_id:ObjectId(id)}
+      const result=await adminBuyPaymentCollection.updateOne(filter,{
+          $set:{status:updateDoc}
+      })
+      res.json(result)
+  });
+
+  // / Delete manage all product ----------
+app.delete("/manageAllOrderDelete/:id", async (req, res) => {
+  const result = await adminBuyPaymentCollection.deleteOne({_id:ObjectId(req.params.id)});
+  res.send(result);
+});
+
+    //    post video apply
+    app.post('/videoApply', async (req, res) => {
+      const user = req.body;
+      console.log(user);
+
+      const result = await applyvideoCollection.insertOne(user);
+      res.json(result)
+    });
+    //    post Upcomming medicine apply
+    app.post('/upMedicine', async (req, res) => {
+      const user = req.body;
+      console.log(user);
+
+      const result = await medicineUpcommingCollection.insertOne(user);
+      res.json(result)
+    });
+
+     // get doctor portal 
+
+     app.get('/applycall', async (req, res) => {
+      const result = await applyvideoCollection.find({}).toArray()
+      res.json(result)
+    });
+
+    // buyer status update 
+
+app.put("/buyerStatusUpdatess/:id", async (req, res) => {
+  console.log(req.body)
+
+  const filter = { _id: ObjectId(req.params.id) };
+  
+  const result = await applyvideoCollection.updateOne(filter, {
+      $set: {
+          code: req.body.statu,
+      },
+      
+  });
+  // console.log(result)
+  res.send(result);
+});
+
+    // myorder check 
+    app.get("/feedback/:email", async (req, res) => {
+      // const buyeremail=req.body.cartProducts.map((data)=>data.buyerEmail)
+      console.log(req.params.email);
+      const email = req.params.email;
+      const result = await applyvideoCollection
+        .find({ usersEmail: email })
+        .toArray();
+      res.send(result);
+    });
+
+
+    // add Blood 
+     app.post('/newBlood', async(req,res) =>{
+            const user=req.body;
+            // console.log(user)
+            const result=await addBloodCollection.insertOne(user);
+            res.json(result)
+        });
+
+        // add nurse 
+     app.post('/newNurse', async(req,res) =>{
+            const user=req.body;
+            // console.log(user)
+            const result=await addNurseCollection.insertOne(user);
+            res.json(result)
+        });
+        // add Organ 
+     app.post('/newOrgan', async(req,res) =>{
+            const user=req.body;
+            // console.log(user)
+            const result=await addOrganCollection.insertOne(user);
+            res.json(result)
+        });
+
+        app.get('/newBlood/:email', async (req, res) => {
+            const result = await addBloodCollection.find({ email: req.params.email }).toArray()
+            // console.log(result)
+            res.send(result)
+        });
+
+        // organ donate 
+
+          app.get('/newOrgan/:email', async (req, res) => {
+            const result = await addOrganCollection.find({ email: req.params.email }).toArray()
+            // console.log(result)
+            res.send(result)
+        });
+
+        // nurse 
+        app.get('/newNurse/:email', async (req, res) => {
+            const result = await addNurseCollection.find({ email: req.params.email }).toArray()
+            // console.log(result)
+            res.send(result)
+        });
+
+        app.get("/addBloods", async (req, res) => {
+          const page = req.query.page;
+          const size = parseInt(req.query.size);
+          const query = req.query;
+          delete query.page
+          delete query.size
+          Object.keys(query).forEach(key => {
+              if (!query[key])
+                  delete query[key]
+          });
+      
+          if (Object.keys(query).length) {
+              const cursor = addBloodCollection.find(query, status = "approved");
+              const count = await cursor.count()
+              const allQuestions = await cursor.skip(page * size).limit(size).toArray()
+              res.json({
+                  allQuestions, count
+              });
+          } else {
+              const cursor = addBloodCollection.find({
+                  // status: "approved"
+              });
+              const count = await cursor.count()
+              const allQuestions = await cursor.skip(page * size).limit(size).toArray()
+      
+              res.json({
+                allQuestions, count
+              });
+          }
+      
+      });
+
+      // nusre 
+
+        app.get("/addNursess", async (req, res) => {
+          const page = req.query.page;
+          const size = parseInt(req.query.size);
+          const query = req.query;
+          delete query.page
+          delete query.size
+          Object.keys(query).forEach(key => {
+              if (!query[key])
+                  delete query[key]
+          });
+      
+          if (Object.keys(query).length) {
+              const cursor = addNurseCollection.find(query, status = "approved");
+              const count = await cursor.count()
+              const allQuestions = await cursor.skip(page * size).limit(size).toArray()
+              res.json({
+                  allQuestions, count
+              });
+          } else {
+              const cursor = addNurseCollection.find({
+                  // status: "approved"
+              });
+              const count = await cursor.count()
+              const allQuestions = await cursor.skip(page * size).limit(size).toArray()
+      
+              res.json({
+                allQuestions, count
+              });
+          }
+      
+      });
+
+
+      // get manage organ 
+
+       app.get("/addOargans", async (req, res) => {
+          const page = req.query.page;
+          const size = parseInt(req.query.size);
+          const query = req.query;
+          delete query.page
+          delete query.size
+          Object.keys(query).forEach(key => {
+              if (!query[key])
+                  delete query[key]
+          });
+      
+          if (Object.keys(query).length) {
+              const cursor = addOrganCollection.find(query, status = "approved");
+              const count = await cursor.count()
+              const allQuestions = await cursor.skip(page * size).limit(size).toArray()
+              res.json({
+                  allQuestions, count
+              });
+          } else {
+              const cursor = addOrganCollection.find({
+                  // status: "approved"
+              });
+              const count = await cursor.count()
+              const allQuestions = await cursor.skip(page * size).limit(size).toArray()
+      
+              res.json({
+                allQuestions, count
+              });
+          }
+      
+      });
+
+      app.get('/getBlood', async(req,res)=>{
+        const result=await addBloodCollection.find({}).toArray()
+        res.json(result)
+    })
+
+    // icu support 
+
+    app.get('/geticuBook', async(req,res)=>{
+      const result=await icuSupportBookCollection.find({}).toArray()
+      res.json(result)
+  })
+    // show organ 
+      app.get('/getOrgan', async(req,res)=>{
+        const result=await addOrganCollection.find({}).toArray()
+        res.json(result)
+    })
+      app.get('/getNurse', async(req,res)=>{
+        const result=await addNurseCollection.find({}).toArray()
+        res.json(result)
+    })
+
+      // blood update 
+
+      // blood status update 
+      app.put("/bloodStatusUpdate/:id", async (req, res) => {
+        // console.log(req.body)
+
+        const filter = { _id: ObjectId(req.params.id) };
+        
+        const result = await addBloodCollection.updateOne(filter, {
+            $set: {
+                status: req.body.statu,
+            },
+            
+        });
+        // console.log(result)
+        res.send(result);
+    });
+
+
+     // organ status update 
+      app.put("/organStatusUpdate/:id", async (req, res) => {
+        // console.log(req.body)
+
+        const filter = { _id: ObjectId(req.params.id) };
+        
+        const result = await addOrganCollection.updateOne(filter, {
+            $set: {
+                status: req.body.statu,
+            },
+            
+        });
+        // console.log(result)
+        res.send(result);
+    });
+
+
+
+     // NURSE status update 
+      app.put("/nurseStatusUpdate/:id", async (req, res) => {
+        // console.log(req.body)
+
+        const filter = { _id: ObjectId(req.params.id) };
+        
+        const result = await addNurseCollection.updateOne(filter, {
+            $set: {
+                status: req.body.statu,
+            },
+            
+        });
+        // console.log(result)
+        res.send(result);
+    });
+
+      //    post Icu Support
+      app.post('/icuSupport', async(req,res) =>{
+        const user=req.body;
+      console.log(user);
+      
+        const result=await icuSupportCollection.insertOne(user);
+        res.json(result)
+    });
+
+    app.get('/postBuyer', async(req,res)=>{
+      const result=await adminuploadMedicinCollection.find({}).toArray()
+      res.json(result)
+  });
+  
     // get doctor
 
     app.get("/getDoctors", async (req, res) => {
@@ -126,6 +464,57 @@ async function run(){
 
   });
 
+  // doctor upload details part get 
+  app.get('/doctorDetails/:id', async (req, res) => {
+    const id = req.params.id
+    const query = { _id: ObjectId(id) }
+    const result = await doctorCollection.findOne(query)
+    res.json(result)
+  });
+
+  // icu upload details part get 
+  app.get('/IcuDetails/:id', async (req, res) => {
+    const id = req.params.id
+    const query = { _id: ObjectId(id) }
+    const result = await icuSupportCollection.findOne(query)
+    res.json(result)
+  });
+
+
+  // get icu 
+
+  app.get("/getIcu", async (req, res) => {
+    const page = req.query.page;
+    const size = parseInt(req.query.size);
+    const query = req.query;
+    delete query.page
+    delete query.size
+    Object.keys(query).forEach(key => {
+        if (!query[key])
+            delete query[key]
+    });
+
+    if (Object.keys(query).length) {
+        const cursor = icuSupportCollection.find(query, status = "approved");
+        const count = await cursor.count()
+        const allQuestions = await cursor.skip(page * size).limit(size).toArray()
+        res.json({
+            allQuestions, count
+        });
+    } else {
+        const cursor = icuSupportCollection.find({
+            // status: "approved"
+        });
+        const count = await cursor.count()
+        const allQuestions = await cursor.skip(page * size).limit(size).toArray()
+
+        res.json({
+            allQuestions, count
+        });
+    }
+
+});
+
 
       //  payment method of api get 
      app.get('/appointments/:id', async(req,res)=>{
@@ -142,7 +531,70 @@ async function run(){
         const result=await appointmentCollection.insertOne(appointment)
         console.log(result)
         res.json(result)
-      })
+      });
+
+
+      // icu support booking 
+      app.post('/bookingicus', async(req,res) =>{
+        const appointment=req.body;
+        const result=await icuSupportBookCollection.insertOne(appointment)
+        console.log(result)
+        res.json(result)
+      });
+
+      app.put('/service', async (req, res) => {
+        
+        console.log(req.body)
+        // const filter = { _id: ObjectId(req.params.id) };
+        const query={
+          HospitalName:req.body.HospitalName}
+        const options = { upsert: true };
+        // const data=req.body
+       
+           
+                const updateDoc = { $push: { likes: req.body } };
+                const result = await icuSupportCollection.updateOne(query, updateDoc, options);
+                console.log(result)
+                res.json(result)
+            
+          
+
+
+});
+
+
+
+      app.get('/applyicu', async (req, res) => {
+        const result = await icuSupportBookCollection.find({}).toArray()
+        res.json(result)
+      });
+
+       // myorder check 
+     app.get("/applyicu/:email", async (req, res) => {
+      // const buyeremail=req.body.cartProducts.map((data)=>data.buyerEmail)
+      console.log(req.params.email);
+      const email = req.params.email;
+      const result = await icuSupportBookCollection
+        .find({ email: email })
+        .toArray();
+      res.send(result);
+      console.log(result)
+    });
+
+      app.put("/StatusUpdatesicu/:id", async (req, res) => {
+        console.log(req.body)
+      
+        const filter = { _id: ObjectId(req.params.id) };
+        
+        const result = await icuSupportBookCollection.updateOne(filter, {
+            $set: {
+                status: req.body.statu,
+            },
+            
+        });
+        // console.log(result)
+        res.send(result);
+      });
 
       // appointment payment add update app put 
       app.put('/appointments/:id',async(req,res)=>{
@@ -213,7 +665,32 @@ async function run(){
           isAdmin=true
         }
         res.json({admin:isAdmin})
-      })
+      });
+
+        // database doctor check korbo 
+        app.get('/registers/:email', async(req,res)=>{
+          const email=req.params.email;
+          const query={email:email}
+          const user=await registerCollection.findOne(query)
+          let isAdmin=false
+          if(user?.role==='doctor'){
+            isAdmin=true
+          }
+          res.json({doctor:isAdmin})
+        })
+
+
+         // database hospital check korbo 
+         app.get('/registerss/:email', async(req,res)=>{
+          const email=req.params.email;
+          const query={email:email}
+          const user=await registerCollection.findOne(query)
+          let isAdmin=false
+          if(user?.role==='hospital'){
+            isAdmin=true
+          }
+          res.json({hospital:isAdmin})
+        })
 
 
       // bikash payment start 
@@ -225,11 +702,11 @@ app.post('/init', async(req, res) => {
       total_amount: req.body.total_amount,
       currency: 'BDT',
       tran_id: uuidv4(),
-      success_url: 'https://doctor-backends-production.up.railway.app/success',
-      // success_url: 'https://doctor-backends-production.up.railway.app/success',
-      fail_url: 'https://doctor-backends-production.up.railway.app/fail',
-      cancel_url: 'https://doctor-backends-production.up.railway.app/cancel',
-      ipn_url: 'https://doctor-backends-production.up.railway.app/ipn',
+      success_url: 'http://localhost:5000/success',
+      // success_url: 'http://localhost:5000/success',
+      fail_url: 'http://localhost:5000/fail',
+      cancel_url: 'http://localhost:5000/cancel',
+      ipn_url: 'http://localhost:5000/ipn',
       shipping_method: 'Courier',
       paymentStatus:'panding',
       product_name: req.body.product_name,
@@ -286,18 +763,18 @@ app.post ('/success', async(req,res)=>{
     }
 
   })
-  // res.status(200).redirect(`https://doctor-portal-5534a.web.app/success/${req.body.tran_id}`)
-  res.status(200).redirect(`https://doctor-portal-5534a.web.app/success/${req.body.tran_id}`)
+  // res.status(200).redirect(`http://localhost:3000/success/${req.body.tran_id}`)
+  res.status(200).redirect(`http://localhost:3000/success/${req.body.tran_id}`)
 })
 app.post ('/fail', async(req,res)=>{
   // console.log(req.body);
 const order=await othersPaymentCollection.deleteOne({tran_id:req.body.tran_id})
-  res.status(400).redirect(`https://doctor-portal-5534a.web.app`)
+  res.status(400).redirect(`http://localhost:3000`)
 })
 app.post ('/cancel', async(req,res)=>{
   // console.log(req.body);
   const order=await othersPaymentCollection.deleteOne({tran_id:req.body.tran_id})
-  res.status(200).redirect(`https://doctor-portal-5534a.web.app`)
+  res.status(200).redirect(`http://localhost:3000`)
 })
 
 // payment validate check and status update for pading to confarm 
@@ -423,6 +900,14 @@ app.get('/orders/:tran_id', async(req,res)=>{
       res.json(result)
   });
 
+  // product upload details part get 
+  app.get('/productssDetails/:id', async (req, res) => {
+    const id = req.params.id
+    const query = { _id: ObjectId(id) }
+    const result = await adminuploadMedicinCollection.findOne(query)
+    res.json(result)
+  });
+
 
 
 
@@ -441,9 +926,9 @@ app.post('/inits', async(req, res) => {
       total_amount: req.body.total_amount,
       currency: req.body.currency,
       tran_id: uuidv4(),
-      success_url: 'https://doctor-backends-production.up.railway.app/successs',
-      fail_url: 'https://doctor-backends-production.up.railway.app/fail',
-      cancel_url: 'https://doctor-backends-production.up.railway.app/cancel',
+      success_url: 'http://localhost:5000/successs',
+      fail_url: 'http://localhost:5000/fail',
+      cancel_url: 'http://localhost:5000/cancel',
       ipn_url: 'http://yoursite.com/ipn',
       shipping_method: 'Courier',
       product_name: "req.body.product_name",
@@ -509,7 +994,7 @@ app.post('/successs',async(req,res)=>{
       }
   
     })
-  res.status(200).redirect(`https://doctor-portal-5534a.web.app/successs/${req.body.tran_id}`)
+  res.status(200).redirect(`http://localhost:3000/successs/${req.body.tran_id}`)
   // res.status(200).json(req.body)
 })
 // k 
@@ -517,12 +1002,12 @@ app.post('/successs',async(req,res)=>{
 app.post ('/fail', async(req,res)=>{
   // console.log(req.body);
 const order=await adminBuyPaymentCollection.deleteOne({tran_id:req.body.tran_id})
-  res.status(400).redirect('https://doctor-portal-5534a.web.app')
+  res.status(400).redirect('http://localhost:3000')
 })
 app.post ('/cancel', async(req,res)=>{
   // console.log(req.body);
   const order=await adminBuyPaymentCollection.deleteOne({tran_id:req.body.tran_id})
-  res.status(200).redirect('https://doctor-portal-5534a.web.app/')
+  res.status(200).redirect('http://localhost:3000/')
 })
 
 
